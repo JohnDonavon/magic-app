@@ -1,4 +1,4 @@
-import { ScryfallCard, ScryfallError, ScryfallList, ScryfallResponse, SearchOptions, NamedCardOptions, ImageVersion, ScryfallCatalog, AutocompleteOptions, RandomCardOptions, CollectionOptions, CollectionResponse, MtgoCardOptions } from './types';
+import { ScryfallCard, ScryfallError, ScryfallList, ScryfallResponse, SearchOptions, NamedCardOptions, ImageVersion, ScryfallCatalog, AutocompleteOptions, RandomCardOptions, CollectionOptions, CollectionResponse, MtgoCardOptions, ScryfallSet, SetsOptions, ScryfallRuling, ScryfallCardSymbol, SymbologyOptions, ScryfallManaCost, ParseManaOptions } from './types';
 
 const API_BASE_URL = 'https://api.scryfall.com';
 
@@ -239,6 +239,58 @@ class ScryfallClient {
     }
   }
 
+  public async getSets(options?: SetsOptions): Promise<ScryfallList<ScryfallSet>> {
+    const params: Record<string, string> = {};
+
+    if (options?.format) {
+      params.format = options.format;
+    }
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallList<ScryfallSet>>('/sets', params);
+  }
+
+  public async getSetByCode(code: string, options?: SetsOptions): Promise<ScryfallSet> {
+    const params: Record<string, string> = {};
+
+    if (options?.format) {
+      params.format = options.format;
+    }
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallSet>(`/sets/${code}`, params);
+  }
+
+  public async getSetByTcgplayerId(id: number, options?: SetsOptions): Promise<ScryfallSet> {
+    const params: Record<string, string> = {};
+
+    if (options?.format) {
+      params.format = options.format;
+    }
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallSet>(`/sets/tcgplayer/${id}`, params);
+  }
+
+  public async getSetById(id: string, options?: SetsOptions): Promise<ScryfallSet> {
+    const params: Record<string, string> = {};
+
+    if (options?.format) {
+      params.format = options.format;
+    }
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallSet>(`/sets/${id}`, params);
+  }
+
   public async getCollection(options: CollectionOptions): Promise<CollectionResponse> {
     if (!options.identifiers || options.identifiers.length === 0) {
       throw new Error('At least one card identifier must be provided');
@@ -388,6 +440,180 @@ class ScryfallClient {
       default:
         throw new Error(`Unsupported format: ${format}`);
     }
+  }
+
+  public async getCardRulings(setCode: string, collectorNumber: string, options?: SetsOptions): Promise<ScryfallList<ScryfallRuling>> {
+    const params: Record<string, string> = {};
+
+    if (options?.format) {
+      params.format = options.format;
+    }
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallList<ScryfallRuling>>(`/cards/${setCode}/${collectorNumber}/rulings`, params);
+  }
+
+  public async getCardRulingsByMultiverseId(id: number): Promise<ScryfallList<ScryfallRuling>> {
+    return this.fetch<ScryfallList<ScryfallRuling>>(`/cards/multiverse/${id}/rulings`);
+  }
+
+  public async getCardRulingsByMtgoId(id: number, options?: SetsOptions): Promise<ScryfallList<ScryfallRuling>> {
+    const params: Record<string, string> = {};
+
+    if (options?.format) {
+      params.format = options.format;
+    }
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallList<ScryfallRuling>>(`/cards/mtgo/${id}/rulings`, params);
+  }
+
+  public async getCardRulingsByArenaId(id: number, options?: SetsOptions): Promise<ScryfallList<ScryfallRuling>> {
+    const params: Record<string, string> = {};
+
+    if (options?.format) {
+      params.format = options.format;
+    }
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallList<ScryfallRuling>>(`/cards/arena/${id}/rulings`, params);
+  }
+
+  public async getCardRulingsByScryfallId(id: string, options?: SetsOptions): Promise<ScryfallList<ScryfallRuling>> {
+    const params: Record<string, string> = {};
+
+    if (options?.format) {
+      params.format = options.format;
+    }
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallList<ScryfallRuling>>(`/cards/${id}/rulings`, params);
+  }
+
+  public async getCardSymbols(options?: SymbologyOptions): Promise<ScryfallList<ScryfallCardSymbol>> {
+    const params: Record<string, string> = {};
+
+    if (options?.format) {
+      params.format = options.format;
+    }
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallList<ScryfallCardSymbol>>('/symbology', params);
+  }
+
+  public async parseManaCost(options: ParseManaOptions): Promise<ScryfallManaCost> {
+    const params: Record<string, string> = {
+      cost: options.cost,
+    };
+
+    if (options.format) {
+      params.format = options.format;
+    }
+    if (options.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallManaCost>('/symbology/parse-mana', params);
+  }
+
+  public async getCatalog(catalogName: string, options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    const params: Record<string, string> = {};
+
+    if (options?.pretty !== undefined) {
+      params.pretty = options.pretty.toString();
+    }
+
+    return this.fetch<ScryfallCatalog>(`/catalog/${catalogName}`, params);
+  }
+
+  public async getCardNames(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('card-names', options);
+  }
+
+  public async getArtistNames(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('artist-names', options);
+  }
+
+  public async getWordBank(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('word-bank', options);
+  }
+
+  public async getSupertypes(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('supertypes', options);
+  }
+
+  public async getCardTypes(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('card-types', options);
+  }
+
+  public async getArtifactTypes(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('artifact-types', options);
+  }
+
+  public async getBattleTypes(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('battle-types', options);
+  }
+
+  public async getCreatureTypes(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('creature-types', options);
+  }
+
+  public async getEnchantmentTypes(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('enchantment-types', options);
+  }
+
+  public async getLandTypes(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('land-types', options);
+  }
+
+  public async getPlaneswalkerTypes(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('planeswalker-types', options);
+  }
+
+  public async getSpellTypes(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('spell-types', options);
+  }
+
+  public async getPowers(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('powers', options);
+  }
+
+  public async getToughnesses(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('toughnesses', options);
+  }
+
+  public async getLoyalties(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('loyalties', options);
+  }
+
+  public async getKeywordAbilities(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('keyword-abilities', options);
+  }
+
+  public async getKeywordActions(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('keyword-actions', options);
+  }
+
+  public async getAbilityWords(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('ability-words', options);
+  }
+
+  public async getFlavorWords(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('flavor-words', options);
+  }
+
+  public async getWatermarks(options?: { pretty?: boolean }): Promise<ScryfallCatalog> {
+    return this.getCatalog('watermarks', options);
   }
 }
 

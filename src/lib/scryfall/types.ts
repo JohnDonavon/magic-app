@@ -40,6 +40,53 @@ export interface ScryfallSet {
   search_uri: string;
 }
 
+export interface ScryfallRuling {
+  object: 'ruling';
+  oracle_id: string;
+  source: 'wotc' | 'scryfall';
+  published_at: string;
+  comment: string;
+}
+
+export interface ScryfallCardSymbol {
+  object: 'card_symbol';
+  symbol: string;
+  loose_variant: string | null;
+  english: string;
+  transposable: boolean;
+  represents_mana: boolean;
+  appears_in_mana_costs: boolean;
+  mana_value: number;
+  hybrid: boolean;
+  phyrexian: boolean;
+  cmc: number;
+  funny: boolean;
+  colors: string[];
+  gatherer_alternates: string[] | null;
+  svg_uri: string | null;
+}
+
+export interface SymbologyOptions {
+  format?: string;
+  pretty?: boolean;
+}
+
+export interface ScryfallManaCost {
+  object: 'mana_cost';
+  cost: string;
+  colors: string[];
+  cmc: number;
+  colorless: boolean;
+  monocolored: boolean;
+  multicolored: boolean;
+}
+
+export interface ParseManaOptions {
+  cost: string;
+  format?: string;
+  pretty?: boolean;
+}
+
 export interface CardFace {
   object: 'card_face';
   artist?: string;
@@ -273,6 +320,11 @@ export interface RandomCardOptions {
   format?: 'json' | 'text' | 'image';
   face?: 'front' | 'back';
   version?: ImageVersion;
+  pretty?: boolean;
+}
+
+export interface SetsOptions {
+  format?: 'json';
   pretty?: boolean;
 }
 
