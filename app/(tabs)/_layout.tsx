@@ -3,7 +3,13 @@ import Icon from '../../src/components/Icon';
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: '#007AFF', tabBarInactiveTintColor: '#8E8E93' }}>
+    <Tabs 
+      screenOptions={{ 
+        tabBarActiveTintColor: '#007AFF', 
+        tabBarInactiveTintColor: '#8E8E93',
+        headerBackTitle: "",
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{

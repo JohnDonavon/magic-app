@@ -10,6 +10,7 @@ export default function SearchScreen() {
   const [searchText, setSearchText] = useState("");
   const [suggestions, setSuggestions] = useState<ScryfallCard[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const router = useRouter();
 
   const handleSearch = useCallback(async (text: string) => {
@@ -32,10 +33,18 @@ export default function SearchScreen() {
   }, []);
 
   const handleCardPress = (card: ScryfallCard) => {
+    if (isNavigating) return;
+    
+    setIsNavigating(true);
     router.push({
       pathname: "/card-details",
       params: { card: JSON.stringify(card) }
     });
+    
+    // Reset the navigation lock after a short delay
+    setTimeout(() => {
+      setIsNavigating(false);
+    }, 500);
   };
 
   return (

@@ -1,5 +1,6 @@
+import React from "react";
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, Stack } from "expo-router";
 import { ScryfallCard } from "../src/lib/scryfall/types";
 import { useState } from "react";
 
@@ -8,8 +9,8 @@ export default function CardDetailsScreen() {
   const cardData = JSON.parse(card as string) as ScryfallCard;
   const [currentFace, setCurrentFace] = useState(0);
 
-  const isDualFaced = cardData.card_faces && cardData.card_faces.length > 1;
-  const currentCardFace = isDualFaced ? cardData.card_faces[currentFace] : cardData;
+  const isDualFaced = Boolean(cardData.card_faces?.length && cardData.card_faces.length > 1);
+  const currentCardFace = isDualFaced ? cardData.card_faces?.[currentFace] : cardData;
 
   const handleFlip = () => {
     if (isDualFaced) {
@@ -17,63 +18,75 @@ export default function CardDetailsScreen() {
     }
   };
 
+  if (!currentCardFace) {
+    return null;
+  }
+
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image
-          source={{ 
-            uri: currentCardFace.image_uris?.normal || 
-                 cardData.image_uris?.normal 
-          }}
-          style={styles.cardImage}
-          resizeMode="contain"
-        />
-        {isDualFaced && (
-          <TouchableOpacity 
-            style={styles.flipButton}
-            onPress={handleFlip}
-          >
-            <Text style={styles.flipButtonText}>
-              {currentFace === 0 ? 'Show Back' : 'Show Front'}
-            </Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <View style={styles.detailsContainer}>
-        <Text style={styles.name}>{currentCardFace.name}</Text>
-        <Text style={styles.type}>{currentCardFace.type_line}</Text>
-        
-        {currentCardFace.mana_cost && (
-          <Text style={styles.manaCost}>{currentCardFace.mana_cost}</Text>
-        )}
-
-        <Text style={styles.oracleText}>{currentCardFace.oracle_text}</Text>
-
-        {currentCardFace.power && currentCardFace.toughness && (
-          <Text style={styles.powerToughness}>
-            {currentCardFace.power}/{currentCardFace.toughness}
-          </Text>
-        )}
-
-        {currentCardFace.loyalty && (
-          <Text style={styles.loyalty}>Loyalty: {currentCardFace.loyalty}</Text>
-        )}
-
-        <View style={styles.setInfo}>
-          <Text style={styles.setName}>{cardData.set_name}</Text>
-          <Text style={styles.setNumber}>
-            {cardData.set.toUpperCase()} {cardData.collector_number}
-          </Text>
+    <>
+      <Stack.Screen
+        options={{
+          title: "Details",
+          headerBackButtonDisplayMode: "minimal",
+        }}
+      />
+      <ScrollView style={styles.container}>
+        <View style={styles.imageContainer}>
+          <Image
+            source={{ 
+              uri: currentCardFace.image_uris?.normal || 
+                   cardData.image_uris?.normal 
+            }}
+            style={styles.cardImage}
+            resizeMode="contain"
+          />
+          {isDualFaced && (
+            <TouchableOpacity 
+              style={styles.flipButton}
+              onPress={handleFlip}
+            >
+              <Text style={styles.flipButtonText}>
+                {currentFace === 0 ? 'Show Back' : 'Show Front'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        {currentCardFace.flavor_text && (
-          <Text style={styles.flavorText}>{currentCardFace.flavor_text}</Text>
-        )}
+        <View style={styles.detailsContainer}>
+          <Text style={styles.name}>{currentCardFace.name}</Text>
+          <Text style={styles.type}>{currentCardFace.type_line}</Text>
+          
+          {currentCardFace.mana_cost && (
+            <Text style={styles.manaCost}>{currentCardFace.mana_cost}</Text>
+          )}
 
-        <Text style={styles.artist}>Illustrated by {cardData.artist}</Text>
-      </View>
-    </ScrollView>
+          <Text style={styles.oracleText}>{currentCardFace.oracle_text}</Text>
+
+          {currentCardFace.power && currentCardFace.toughness && (
+            <Text style={styles.powerToughness}>
+              {currentCardFace.power}/{currentCardFace.toughness}
+            </Text>
+          )}
+
+          {currentCardFace.loyalty && (
+            <Text style={styles.loyalty}>Loyalty: {currentCardFace.loyalty}</Text>
+          )}
+
+          <View style={styles.setInfo}>
+            <Text style={styles.setName}>{cardData.set_name}</Text>
+            <Text style={styles.setNumber}>
+              {cardData.set.toUpperCase()} {cardData.collector_number}
+            </Text>
+          </View>
+
+          {currentCardFace.flavor_text && (
+            <Text style={styles.flavorText}>{currentCardFace.flavor_text}</Text>
+          )}
+
+          <Text style={styles.artist}>Illustrated by {cardData.artist}</Text>
+        </View>
+      </ScrollView>
+    </>
   );
 }
 
