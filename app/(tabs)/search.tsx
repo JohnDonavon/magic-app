@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TextInput, TouchableWithoutFeedback, Keyboard, FlatList, Image, ActivityIndicator } from "react-native";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useRouter } from "expo-router";
 import ScryfallClient from "../../src/lib/scryfall/client";
 import { ScryfallCard, SearchOptions } from "../../src/lib/scryfall/types";
@@ -11,6 +11,7 @@ export default function SearchScreen() {
   const [suggestions, setSuggestions] = useState<ScryfallCard[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const latestRequestId = useRef<number>(0);
   const router = useRouter();
 
   const handleSearch = useCallback(async (text: string) => {
@@ -21,14 +22,27 @@ export default function SearchScreen() {
     }
 
     setIsLoading(true);
+    const currentRequestId = ++latestRequestId.current;
+
     try {
       const options: SearchOptions = { q: text };
       const response = await scryfall.searchCards(options);
-      setSuggestions(response.data);
+      
+      // Only update if this is still the latest request
+      if (currentRequestId === latestRequestId.current) {
+        setSuggestions(response.data);
+      }
     } catch (error) {
       console.error("Error fetching suggestions:", error);
+      // Only clear suggestions if this is still the latest request
+      if (currentRequestId === latestRequestId.current) {
+        setSuggestions([]);
+      }
     } finally {
-      setIsLoading(false);
+      // Only update loading state if this is still the latest request
+      if (currentRequestId === latestRequestId.current) {
+        setIsLoading(false);
+      }
     }
   }, []);
 
