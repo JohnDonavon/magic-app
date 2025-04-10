@@ -8,6 +8,7 @@ import SearchIcon from '../../assets/icons/search.svg';
 import ArchiveIcon from '../../assets/icons/archive.svg';
 import CardsBlankIcon from '../../assets/icons/cards-blank.svg';
 import CameraIcon from '../../assets/icons/camera.svg';
+import TransformIcon from '../../assets/icons/transform.svg';
 
 export enum IconNames {
   'home',
@@ -15,6 +16,7 @@ export enum IconNames {
   'archive',
   'cards-blank',
   'camera',
+  'transform',
 }
 
 export type IconNamesUnion = keyof typeof IconNames;
@@ -46,6 +48,8 @@ const Icon = React.memo(({ name, color, size, ...rest }: IconProps) => {
       return <CardsBlankIcon {...rest} />;
     case 'camera':
       return <CameraIcon {...rest} />;
+    case 'transform':
+      return <TransformIcon {...rest} />;
     default:
       return null;
   }

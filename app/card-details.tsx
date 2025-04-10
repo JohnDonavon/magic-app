@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from "rea
 import { useLocalSearchParams, Stack } from "expo-router";
 import { ScryfallCard } from "../src/lib/scryfall/types";
 import { useState } from "react";
+import Icon from "../src/components/Icon";
 
 export default function CardDetailsScreen() {
   const { card } = useLocalSearchParams();
@@ -42,11 +43,12 @@ export default function CardDetailsScreen() {
           />
           {isDualFaced && (
             <TouchableOpacity 
-              style={styles.flipButton}
+              style={styles.transformButton}
               onPress={handleFlip}
             >
-              <Text style={styles.flipButtonText}>
-                {currentFace === 0 ? 'Show Back' : 'Show Front'}
+              <Icon name="transform" size={24} color="#fff" />
+              <Text style={styles.transformButtonText}>
+                Transform
               </Text>
             </TouchableOpacity>
           )}
@@ -104,15 +106,20 @@ const styles = StyleSheet.create({
     height: 400,
     borderRadius: 8,
   },
-  flipButton: {
+  transformButton: {
     marginTop: 16,
     padding: 12,
-    backgroundColor: "#f4511e",
+    backgroundColor: "#4a4a4a",
     borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
-  flipButtonText: {
+  transformButtonText: {
     color: "#fff",
     fontWeight: "bold",
+    fontSize: 16,
   },
   detailsContainer: {
     padding: 16,
