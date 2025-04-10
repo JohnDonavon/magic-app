@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import { Card, Deck, DeckCard } from './models';
 
 // Open the database
 const db = SQLite.openDatabaseSync('mtg_overseer.db');
@@ -12,18 +13,69 @@ export const initDatabase = async () => {
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS cards (
       id TEXT PRIMARY KEY,
+      oracle_id TEXT,
+      multiverse_ids TEXT,
+      mtgo_id INTEGER,
+      mtgo_foil_id INTEGER,
+      tcgplayer_id INTEGER,
+      cardmarket_id INTEGER,
       name TEXT NOT NULL,
+      lang TEXT,
+      released_at TEXT,
+      uri TEXT,
+      scryfall_uri TEXT,
+      layout TEXT,
+      highres_image BOOLEAN,
+      image_status TEXT,
+      image_uris TEXT,
       mana_cost TEXT,
-      cmc INTEGER,
+      cmc REAL,
       type_line TEXT,
       oracle_text TEXT,
       power TEXT,
       toughness TEXT,
       colors TEXT,
       color_identity TEXT,
+      keywords TEXT,
+      legalities TEXT,
+      games TEXT,
+      reserved BOOLEAN,
+      finishes TEXT,
+      oversized BOOLEAN,
+      promo BOOLEAN,
+      reprint BOOLEAN,
+      variation BOOLEAN,
+      set_id TEXT,
       set TEXT,
+      set_name TEXT,
+      set_type TEXT,
+      set_uri TEXT,
+      set_search_uri TEXT,
+      scryfall_set_uri TEXT,
+      rulings_uri TEXT,
+      prints_search_uri TEXT,
+      collector_number TEXT,
+      digital BOOLEAN,
       rarity TEXT,
-      image_uris TEXT,
+      card_back_id TEXT,
+      artist TEXT,
+      artist_ids TEXT,
+      illustration_id TEXT,
+      border_color TEXT,
+      frame TEXT,
+      frame_effects TEXT,
+      security_stamp TEXT,
+      full_art BOOLEAN,
+      textless BOOLEAN,
+      booster BOOLEAN,
+      story_spotlight BOOLEAN,
+      edhrec_rank INTEGER,
+      penny_rank INTEGER,
+      prices TEXT,
+      related_uris TEXT,
+      purchase_uris TEXT,
+      card_faces TEXT,
+      all_parts TEXT,
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
@@ -52,7 +104,22 @@ export const initDatabase = async () => {
 
   // Prepare statements for common operations
   insertCardStmt = await db.prepareAsync(
-    'INSERT INTO cards (id, name, mana_cost, cmc, type_line, oracle_text, power, toughness, colors, color_identity, set, rarity, image_uris, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    `INSERT INTO cards (
+      id, oracle_id, multiverse_ids, mtgo_id, mtgo_foil_id, tcgplayer_id, cardmarket_id,
+      name, lang, released_at, uri, scryfall_uri, layout, highres_image, image_status,
+      image_uris, mana_cost, cmc, type_line, oracle_text, power, toughness, colors,
+      color_identity, keywords, legalities, games, reserved, finishes,
+      oversized, promo, reprint, variation, set_id, set, set_name, set_type, set_uri,
+      set_search_uri, scryfall_set_uri, rulings_uri, prints_search_uri, collector_number,
+      digital, rarity, card_back_id, artist, artist_ids, illustration_id, border_color,
+      frame, frame_effects, security_stamp, full_art, textless, booster, story_spotlight,
+      edhrec_rank, penny_rank, prices, related_uris, purchase_uris, card_faces, all_parts,
+      created_at, updated_at
+    ) VALUES (
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+      ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+    )`
   );
 
   insertDeckStmt = await db.prepareAsync(
@@ -82,60 +149,74 @@ export const executeUpdate = async (query: string, params: any[] = []): Promise<
   }
 };
 
-interface Card {
-  id: string;
-  name: string;
-  mana_cost?: string;
-  cmc?: number;
-  type_line?: string;
-  oracle_text?: string;
-  power?: string;
-  toughness?: string;
-  colors?: string;
-  color_identity?: string;
-  set?: string;
-  rarity?: string;
-  image_uris?: string;
-  created_at: number;
-  updated_at: number;
-}
-
-interface Deck {
-  id: string;
-  name: string;
-  description?: string;
-  format?: string;
-  created_at: number;
-  updated_at: number;
-}
-
-interface DeckCard {
-  id: string;
-  deck_id: string;
-  card_id: string;
-  quantity: number;
-  is_sideboard: boolean;
-  created_at: number;
-  updated_at: number;
-}
-
 export const insertCard = async (card: Card): Promise<void> => {
   try {
     if (!insertCardStmt) throw new Error('Database not initialized');
     await insertCardStmt.executeAsync([
       card.id,
+      card.oracle_id || null,
+      JSON.stringify(card.multiverse_ids || []),
+      card.mtgo_id || null,
+      card.mtgo_foil_id || null,
+      card.tcgplayer_id || null,
+      card.cardmarket_id || null,
       card.name,
+      card.lang || null,
+      card.released_at || null,
+      card.uri || null,
+      card.scryfall_uri || null,
+      card.layout || null,
+      card.highres_image || false,
+      card.image_status || null,
+      JSON.stringify(card.image_uris || {}),
       card.mana_cost || null,
       card.cmc || null,
       card.type_line || null,
       card.oracle_text || null,
       card.power || null,
       card.toughness || null,
-      card.colors || null,
-      card.color_identity || null,
+      JSON.stringify(card.colors || []),
+      JSON.stringify(card.color_identity || []),
+      JSON.stringify(card.keywords || []),
+      JSON.stringify(card.legalities || {}),
+      JSON.stringify(card.games || []),
+      card.reserved || false,
+      JSON.stringify(card.finishes || []),
+      card.oversized || false,
+      card.promo || false,
+      card.reprint || false,
+      card.variation || false,
+      card.set_id || null,
       card.set || null,
+      card.set_name || null,
+      card.set_type || null,
+      card.set_uri || null,
+      card.set_search_uri || null,
+      card.scryfall_set_uri || null,
+      card.rulings_uri || null,
+      card.prints_search_uri || null,
+      card.collector_number || null,
+      card.digital || false,
       card.rarity || null,
-      card.image_uris || null,
+      card.card_back_id || null,
+      card.artist || null,
+      JSON.stringify(card.artist_ids || []),
+      card.illustration_id || null,
+      card.border_color || null,
+      card.frame || null,
+      JSON.stringify(card.frame_effects || []),
+      card.security_stamp || null,
+      card.full_art || false,
+      card.textless || false,
+      card.booster || false,
+      card.story_spotlight || false,
+      card.edhrec_rank || null,
+      card.penny_rank || null,
+      JSON.stringify(card.prices || {}),
+      JSON.stringify(card.related_uris || {}),
+      JSON.stringify(card.purchase_uris || {}),
+      JSON.stringify(card.card_faces || []),
+      JSON.stringify(card.all_parts || []),
       card.created_at,
       card.updated_at
     ]);
