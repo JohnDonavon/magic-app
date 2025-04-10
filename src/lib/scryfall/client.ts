@@ -5,7 +5,7 @@ const API_BASE_URL = 'https://api.scryfall.com';
 class ScryfallClient {
   private static instance: ScryfallClient;
   private lastRequestTime: number = 0;
-  private readonly MIN_REQUEST_DELAY = 100; // 100ms minimum delay between requests
+  private readonly MIN_REQUEST_DELAY = 50; // 100ms minimum delay between requests
 
   private constructor() {}
 
@@ -42,7 +42,7 @@ class ScryfallClient {
     const response = await fetch(url.toString(), {
       headers: {
         'User-Agent': 'MTGOverseer/1.0',
-        'Accept': 'application/json',
+        'Accept': 'application/json;q=0.9,*/*;q=0.8',
       },
     });
 
@@ -71,6 +71,7 @@ class ScryfallClient {
     const response = await fetch(url.toString(), {
       headers: {
         'User-Agent': 'MTGOverseer/1.0',
+        'Accept': 'image/*;q=0.9,*/*;q=0.8',
       },
     });
 
@@ -95,7 +96,7 @@ class ScryfallClient {
     const response = await fetch(url.toString(), {
       headers: {
         'User-Agent': 'MTGOverseer/1.0',
-        'Accept': 'text/plain',
+        'Accept': 'text/plain;q=0.9,*/*;q=0.8',
       },
     });
 
