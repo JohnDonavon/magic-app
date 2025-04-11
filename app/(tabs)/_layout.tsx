@@ -6,7 +6,8 @@ export default function TabLayout() {
     <Tabs 
       screenOptions={{ 
         tabBarActiveTintColor: '#007AFF', 
-        tabBarInactiveTintColor: '#8E8E93'
+        tabBarInactiveTintColor: '#8E8E93',
+        headerShown: true
       }}
     >
       <Tabs.Screen
@@ -21,6 +22,7 @@ export default function TabLayout() {
         options={{
           title: 'Search',
           tabBarIcon: ({ color, size }) => <Icon name="search" color={color} size={size} />,
+          headerShown: false,
         }}
       />
       <Tabs.Screen
